@@ -27,7 +27,6 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItemDefaults.contentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -36,6 +35,10 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -45,10 +48,32 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import gabriel.soares.br.clientesapp.R
+import gabriel.soares.br.clientesapp.model.Cliente
+import gabriel.soares.br.clientesapp.service.RetrofitFactory
 import gabriel.soares.br.clientesapp.ui.theme.ClientesAppTheme
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
+
+    // cria uma instancia do retroftFactory
+    val clienteApi = RetrofitFactory().getClienteService()
+
+    // criar uma variavel de estado para armazenar a lista de clientes na Api
+    val clientes by remember {
+        mutableStateOf(listOf<Cliente>())
+    }
+
+    LaunchedEffect(Dispatchers.IO) {
+
+    }
+
+    GlobalScope.launch(Dispatchers.IO) {
+
+    }
+
     // fornece a estrutura básica para a interface do usuário ( pode criar os componentes separamente ) é um sistema de andaime
     Scaffold(
         topBar = {
@@ -163,7 +188,57 @@ private fun BarraDeTituloPreview() {
 
 @Composable
 fun NavigationBar(modifier: Modifier = Modifier) {
-    
+    NavigationBar(
+        containerColor = MaterialTheme
+            .colorScheme.primary,
+        contentColor = MaterialTheme
+            .colorScheme.onPrimary
+    ) {
+        NavigationBarItem(
+            selected = false,
+            onClick = {},
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Home,
+                    contentDescription = "Home",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            },
+            label = {
+                Text(text = "Home", color = MaterialTheme.colorScheme.onPrimary)
+            }
+        )
+
+        NavigationBarItem(
+            selected = false,
+            onClick = {},
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Favorite",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            },
+            label = {
+                Text(text = "Favorite", color = MaterialTheme.colorScheme.onPrimary)
+            }
+        )
+
+        NavigationBarItem(
+            selected = false,
+            onClick = {},
+            icon = {
+                Icon(
+                    imageVector = Icons.Default.Menu,
+                    contentDescription = "Menu",
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            },
+            label = {
+                Text(text = "Menu", color = MaterialTheme.colorScheme.onPrimary)
+            }
+        )
+    }
 }
 
 // Preview para Barra de Navegacao ( BottomBar )
@@ -172,7 +247,7 @@ fun NavigationBar(modifier: Modifier = Modifier) {
 private fun BarraDeNavegacao(
     modifier: Modifier = Modifier){
     NavigationBar(
-        containerColor = MaterialTheme.colorScheme.Primary
+        containerColor = MaterialTheme.colorScheme.primary
     ){
         NavigationBarItem(
             selected = false,
@@ -306,6 +381,7 @@ private fun ClienteCardPreview() {
 
 //--------------------------------------------------------------------------------------------------
 // Preview para TUDO
+
 // uiMode, altera o tema sem precisar iniciar o aplicativo
 @Preview (uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
