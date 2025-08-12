@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             ClientesAppTheme {
-//              HomeScreen()
+//                HomeScreen()
                 FormCliente()
             }
         }
@@ -33,7 +33,7 @@ fun Greeting(name: String, modifier: Modifier = Modifier) {
     )
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = false)
 @Composable
 fun GreetingPreview() {
     ClientesAppTheme {

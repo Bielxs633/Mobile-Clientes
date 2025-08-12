@@ -1,10 +1,14 @@
 package gabriel.soares.br.clientesapp.screens
 
+import android.util.Patterns
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -26,13 +30,28 @@ import retrofit2.await
 @Composable
 fun FormCliente(modifier: Modifier = Modifier) {
 
-    // variavel de estado para utilizar no outlined
+    // variaveis de estado para utilizar no outlined
     var nomeCliente by remember {
         mutableStateOf("")
     }
-    // variavel de estado para utilizar no outlined
     var emailCliente by remember {
         mutableStateOf("")
+    }
+
+    // variaveis de estado para validar a entrada do usuario
+    var isNomeError by remember {
+        mutableStateOf(false)
+    }
+    var isEmailError by remember {
+        mutableStateOf(false)
+    }
+
+    fun validar(): Boolean {
+        isNomeError = nomeCliente.length < 1
+        // .Patterns - confere se tudo esta no padrao correto
+        // ! - para deixar o contrario
+        isEmailError = !Patterns.EMAIL_ADDRESS.matcher(emailCliente).matches()
+        return !isNomeError && !isEmailError
     }
 
     // Criar uma instancia do RetrofitFactory
@@ -49,6 +68,17 @@ fun FormCliente(modifier: Modifier = Modifier) {
             label = {
                 Text(text = "Nome do Cliente")
             },
+            supportingText = {
+                // parece só no caso de erro
+                if (isNomeError)
+                Text(text = "O Nome do Cliente é Obrigatório!")
+            },
+            trailingIcon = {
+                if (isNomeError){
+                    Icon(imageVector = Icons.Default.Info, contentDescription = "Erro")
+                }
+            },
+            isError = isNomeError,
             modifier = Modifier
                 .fillMaxWidth()
         )
@@ -58,22 +88,38 @@ fun FormCliente(modifier: Modifier = Modifier) {
             label = {
                 Text(text = "E-mail do Cliente")
             },
+            supportingText = {
+                // parece só no caso de erro
+                if (isEmailError)
+                Text(text = "O Email do Cliente é Obrigatório!")
+            },
+            trailingIcon = {
+                if (isEmailError){
+                    Icon(imageVector = Icons.Default.Info, contentDescription = "Erro")
+                }
+            },
+            isError = isEmailError,
             modifier = Modifier
                 .fillMaxWidth()
         )
         Button(
             onClick = {
                 //Criar um cliente com os dados informados
-                val cliente = Cliente(
-                    nome = nomeCliente,
-                    email = emailCliente
-                )
-                //Requisicao POST para a API
-                GlobalScope.launch(
-                    Dispatchers.IO
-                ) {
-                    val novoCliente = clienteApi.criar(cliente).await()
-                    println(novoCliente)
+                if (validar()) {
+                    val cliente = Cliente(
+                        nome = nomeCliente,
+                        email = emailCliente
+                    )
+                    //Requisicao POST para a API
+                    // assim que apertar o batao vai ser  executado, ja ira chamar
+                    GlobalScope.launch(
+                        Dispatchers.IO
+                    ) {
+                        val novoCliente = clienteApi.criar(cliente).await()
+//                    println(novoCliente)
+                    }
+                } else {
+//                    println("Os dados estao incorretos!")
                 }
             },
             modifier = Modifier

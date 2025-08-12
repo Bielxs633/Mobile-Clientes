@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
@@ -39,6 +40,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -52,8 +54,7 @@ import gabriel.soares.br.clientesapp.model.Cliente
 import gabriel.soares.br.clientesapp.service.RetrofitFactory
 import gabriel.soares.br.clientesapp.ui.theme.ClientesAppTheme
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import retrofit2.await
 
 @Composable
 fun HomeScreen(modifier: Modifier = Modifier) {
@@ -62,16 +63,14 @@ fun HomeScreen(modifier: Modifier = Modifier) {
     val clienteApi = RetrofitFactory().getClienteService()
 
     // criar uma variavel de estado para armazenar a lista de clientes na Api
-    val clientes by remember {
+    var clientes by remember {
         mutableStateOf(listOf<Cliente>())
     }
 
+    // assim que o programa ser executado, ja ira chamar
     LaunchedEffect(Dispatchers.IO) {
-
-    }
-
-    GlobalScope.launch(Dispatchers.IO) {
-
+        clientes = clienteApi.listarTodos().await()
+//        println(clientes)
     }
 
     // fornece a estrutura básica para a interface do usuário ( pode criar os componentes separamente ) é um sistema de andaime
@@ -116,8 +115,8 @@ fun HomeScreen(modifier: Modifier = Modifier) {
             }
             // Replica o objeto
             LazyColumn {
-                items(10) {
-                    ClienteCard()
+                items(clientes) { cliente ->
+                    ClienteCard(cliente)
                 }
             }
         }
@@ -335,7 +334,7 @@ private fun BotaoFlutuantePreview() {
 // Cliente Card
 
 @Composable
-fun ClienteCard(modifier: Modifier = Modifier) {
+fun ClienteCard(cliente: Cliente) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -357,11 +356,11 @@ fun ClienteCard(modifier: Modifier = Modifier) {
         ) {
             Column {
                 Text(
-                    text = "Nome do Cliente",
+                    text = cliente.nome,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "E-mail do Cliente",
+                    text = cliente.email,
                     fontSize = 12.sp
                 )
             }
@@ -376,7 +375,7 @@ fun ClienteCard(modifier: Modifier = Modifier) {
 @Preview
 @Composable
 private fun ClienteCardPreview() {
-    ClienteCard()
+    ClienteCard(Cliente())
 }
 
 //--------------------------------------------------------------------------------------------------
