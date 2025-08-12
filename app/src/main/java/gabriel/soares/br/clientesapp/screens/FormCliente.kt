@@ -75,7 +75,9 @@ fun FormCliente(modifier: Modifier = Modifier) {
             },
             trailingIcon = {
                 if (isNomeError){
-                    Icon(imageVector = Icons.Default.Info, contentDescription = "Erro")
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = "Erro")
                 }
             },
             isError = isNomeError,
@@ -95,7 +97,9 @@ fun FormCliente(modifier: Modifier = Modifier) {
             },
             trailingIcon = {
                 if (isEmailError){
-                    Icon(imageVector = Icons.Default.Info, contentDescription = "Erro")
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = "Erro")
                 }
             },
             isError = isEmailError,
