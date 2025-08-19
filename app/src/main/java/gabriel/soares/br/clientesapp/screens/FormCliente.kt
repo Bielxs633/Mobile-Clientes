@@ -2,13 +2,19 @@ package gabriel.soares.br.clientesapp.screens
 
 import android.util.Patterns
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,9 +22,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import gabriel.soares.br.clientesapp.model.Cliente
 import gabriel.soares.br.clientesapp.service.RetrofitFactory
 import gabriel.soares.br.clientesapp.ui.theme.ClientesAppTheme
@@ -28,7 +37,7 @@ import kotlinx.coroutines.launch
 import retrofit2.await
 
 @Composable
-fun FormCliente(modifier: Modifier = Modifier) {
+fun FormCliente(navController: NavHostController?) {
 
     // variaveis de estado para utilizar no outlined
     var nomeCliente by remember {
@@ -54,6 +63,11 @@ fun FormCliente(modifier: Modifier = Modifier) {
         return !isNomeError && !isEmailError
     }
 
+    // cariavel que vai exibir a caixa de dialogo
+    var mostrarTelaSucesso by remember {
+        mutableStateOf(false)
+    }
+
     // Criar uma instancia do RetrofitFactory
     val clienteApi = RetrofitFactory().getClienteService()
 
@@ -62,6 +76,23 @@ fun FormCliente(modifier: Modifier = Modifier) {
             .padding(16.dp)
             .fillMaxSize()
     ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically
+        ){
+            Icon(
+                imageVector = Icons.Default.Person,
+                contentDescription = "Icone de Cadastro"
+            )
+            Text(
+                text = "Novo Cliente",
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold
+            )
+        }
+        Spacer(
+            modifier = Modifier
+                .height(32.dp)
+        )
         OutlinedTextField(
             value = nomeCliente,
             onValueChange = { nome -> nomeCliente = nome },
@@ -120,10 +151,11 @@ fun FormCliente(modifier: Modifier = Modifier) {
                         Dispatchers.IO
                     ) {
                         val novoCliente = clienteApi.criar(cliente).await()
+                        mostrarTelaSucesso = true
 //                    println(novoCliente)
                     }
                 } else {
-//                    println("Os dados estao incorretos!")
+                    println("Os dados estao incorretos!")
                 }
             },
             modifier = Modifier
@@ -132,14 +164,31 @@ fun FormCliente(modifier: Modifier = Modifier) {
         ) {
             Text(text = "Gerar Cliente")
         }
-    }
 
+        if (mostrarTelaSucesso)
+
+            AlertDialog(
+                onDismissRequest = {},
+                title = { Text(text = "Sucesso") },
+                text = { Text(text = "Cliente gravado com sucesso!") },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            navController!!.navigate("Home")
+                        }
+                    ) {
+                        Text(text = "OK")
+                    }
+                }
+            )
+
+    }
 }
 
 @Preview
 @Composable
 private fun FormClientePreview() {
     ClientesAppTheme {
-        FormCliente()
+        FormCliente(null)
     }
 }
